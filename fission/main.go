@@ -95,7 +95,7 @@ func main() {
 		if err != nil {
 			fmt.Printf("Error getting Fission API version: %v", err)
 		} else {
-			fmt.Printf("Server Version: %v", serverVer)
+			fmt.Printf("Server Version: %v\n", serverVer)
 		}
 	}
 
@@ -167,14 +167,16 @@ func main() {
 
 	// timetriggers
 	ttNameFlag := cli.StringFlag{Name: "name", Usage: "Time Trigger name"}
-	ttCronFlag := cli.StringFlag{Name: "cron", Usage: "Time Trigger cron spec ('0 30 * * *', '@every 5m', '@hourly')"}
+	ttCronFlag := cli.StringFlag{Name: "cron", Usage: "Time Trigger cron spec ('0 30 * * * *', '@every 5m', '@hourly')"}
 	ttFnNameFlag := cli.StringFlag{Name: "function", Usage: "Function name"}
+	ttRoundFlag := cli.IntFlag{Name: "round", Value: 1, Usage: "Get next N rounds of invocation time"}
 	ttSubcommands := []cli.Command{
 		{Name: "create", Aliases: []string{"add"}, Usage: "Create Time trigger", Flags: []cli.Flag{ttNameFlag, ttFnNameFlag, ttCronFlag, specSaveFlag}, Action: ttCreate},
 		{Name: "get", Usage: "Get Time trigger", Flags: []cli.Flag{}, Action: ttGet},
 		{Name: "update", Usage: "Update Time trigger", Flags: []cli.Flag{ttNameFlag, ttCronFlag, ttFnNameFlag}, Action: ttUpdate},
 		{Name: "delete", Usage: "Delete Time trigger", Flags: []cli.Flag{ttNameFlag}, Action: ttDelete},
 		{Name: "list", Usage: "List Time triggers", Flags: []cli.Flag{}, Action: ttList},
+		{Name: "test", Usage: "Test time trigger cron spec", Flags: []cli.Flag{ttCronFlag, ttRoundFlag}, Action: ttTest},
 	}
 
 	// Message queue trigger
