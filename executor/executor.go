@@ -25,7 +25,6 @@ import (
 
 	"github.com/dchest/uniuri"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 
 	"github.com/fission/fission"
 	"github.com/fission/fission/cache"
@@ -41,7 +40,6 @@ type (
 		ndm           *newdeploy.NewDeploy
 		functionEnv   *cache.Cache
 		fissionClient *crd.FissionClient
-		k8sClient     *kubernetes.Clientset
 		fsCache       *fscache.FunctionServiceCache
 
 		requestChan chan *createFuncServiceRequest
@@ -58,13 +56,12 @@ type (
 	}
 )
 
-func MakeExecutor(gpm *poolmgr.GenericPoolManager, ndm *newdeploy.NewDeploy, fissionClient *crd.FissionClient, k8sClient *kubernetes.Clientset, fsCache *fscache.FunctionServiceCache) *Executor {
+func MakeExecutor(gpm *poolmgr.GenericPoolManager, ndm *newdeploy.NewDeploy, fissionClient *crd.FissionClient, fsCache *fscache.FunctionServiceCache) *Executor {
 	executor := &Executor{
 		gpm:           gpm,
 		ndm:           ndm,
 		functionEnv:   cache.MakeCache(10*time.Second, 0),
 		fissionClient: fissionClient,
-		k8sClient:     k8sClient,
 		fsCache:       fsCache,
 
 		requestChan: make(chan *createFuncServiceRequest),
@@ -239,7 +236,7 @@ func StartExecutor(fissionNamespace string, functionNamespace string, envBuilder
 		fissionClient, kubernetesClient, restClient,
 		functionNamespace, fsCache, poolID)
 
-	api := MakeExecutor(gpm, ndm, fissionClient, kubernetesClient, fsCache)
+	api := MakeExecutor(gpm, ndm, fissionClient, fsCache)
 
 	go api.Serve(port)
 
